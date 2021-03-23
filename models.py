@@ -24,13 +24,15 @@ from torch.nn import Parameter
 from torch.nn import Sequential as Seq, Linear, ReLU, LeakyReLU
 from torch_geometric.nn import MessagePassing
 from torch.nn import Linear, Sequential, ReLU, BatchNorm1d as BN
-from torch_geometric.utils import scatter_
 from torch_geometric.data import Batch 
 from torch_scatter import scatter_min, scatter_max, scatter_add, scatter_mean
 from torch import autograd
-from torch_geometric.utils import softmax, add_self_loops, remove_self_loops, segregate_self_loops, remove_isolated_nodes, contains_isolated_nodes, add_remaining_self_loops
-from my_utils.cut_utils import get_diracs
+from torch_geometric.utils import softmax, add_self_loops, remove_self_loops, segregate_self_loops, remove_isolated_nodes, contains_isolated_nodes, add_remaining_self_loops, dropout_adj
+from modules_and_utils import get_diracs, get_mask, propagate
+from torch_geometric.nn.norm.graph_size_norm import GraphSizeNorm
 ###########
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class cut_MPNN(torch.nn.Module):
     def __init__(self, dataset, num_layers, hidden1, hidden2, deltas, elasticity=0.01, num_iterations = 30):
@@ -239,16 +241,14 @@ class cut_MPNN(torch.nn.Module):
     
     
 class clique_MPNN(torch.nn.Module):
-    def __init__(self, dataset, num_layers, hidden1, hidden2, deltas, elasticity=0.01, num_iterations = 30):
-        super(cliqueMPNN_hindsight_earlyGAT, self).__init__()
+    def __init__(self, dataset, num_layers, hidden1, hidden2, deltas):
+        super(clique_MPNN, self).__init__()
         self.hidden1 = hidden1
         self.hidden2 = hidden2
         self.momentum = 0.1
-        self.num_iterations = num_iterations
         self.convs = torch.nn.ModuleList()
         self.deltas = deltas
         self.numlayers = num_layers
-        self.elasticity = elasticity
         self.heads = 8
         self.concat = True
         
@@ -354,19 +354,7 @@ class clique_MPNN(torch.nn.Module):
         #min-max normalize
         x = (x-batch_min)/(batch_max+1e-6-batch_min)
         probs=x
-           
-        x2 = x.detach()              
-        deg = degree(row).unsqueeze(-1) 
-        totalvol = scatter_add(deg.detach()*torch.ones_like(x, device=device), batch, 0)+1e-6
-        totalcard = scatter_add(torch.ones_like(x, device=device), batch, 0)+1e-6               
-        x2 =  ((x2 - torch.rand_like(x, device = device))>0).float()    
-        vol_1 = scatter_add(probs*deg, batch, 0)+1e-6
-        card_1 = scatter_add(probs, batch,0)            
-        set_size = scatter_add(x2, batch, 0)
-        vol_hard = scatter_add(deg*x2, batch, 0, dim_size = batch.max().item()+1)+1e-6 
-        total_vol_ratio = vol_hard/totalvol
-        
-        
+
         #calculating the terms for the expected distance between clique and graph
         pairwise_prodsums = torch.zeros(num_graphs, device = device)
         for graph in range(num_graphs):
@@ -380,17 +368,6 @@ class clique_MPNN(torch.nn.Module):
         expected_clique_weight = (pairwise_prodsums.unsqueeze(-1) - self_sums)/1.
         expected_distance = (expected_clique_weight - expected_weight_G)        
         
-        
-        ###useful numbers 
-        max_set_weight = (scatter_add(torch.ones_like(x)[no_loop_row], batch[no_loop_row], 0, dim_size = num_graphs)/2).squeeze(-1)                
-        set_weight = (scatter_add(x2[no_loop_row]*x2[no_loop_col], batch[no_loop_row], 0, dim_size = num_graphs)/2)+1e-6
-        clique_edges_hard = (set_size*(set_size-1)/2) +1e-6
-        clique_dist_hard = set_weight/clique_edges_hard
-        clique_check = ((clique_edges_hard != clique_edges_hard))
-        setedge_check  = ((set_weight != set_weight))      
-        
-        assert ((clique_dist_hard>=1.1).sum())<=1e-6, "Invalid set vol/clique vol ratio."
-
         ###calculate loss
         expected_loss = (penalty_coefficient)*expected_distance*0.5 - 0.5*expected_weight_G  
         
@@ -401,20 +378,10 @@ class clique_MPNN(torch.nn.Module):
         retdict = {}
         
         retdict["output"] = [probs.squeeze(-1),"hist"]   #output
-        retdict["Expected_cardinality"] = [card_1.mean(),"sequence"]
-        retdict["Expected_cardinality_hist"] = [card_1,"hist"]
         retdict["losses histogram"] = [loss.squeeze(-1),"hist"]
-        retdict["Set sizes"] = [set_size.squeeze(-1),"hist"]
-        retdict["volume_hard"] = [vol_hard.mean(),"aux"] #volume2
-        retdict["cardinality_hard"] = [set_size[0],"sequence"] #volumeq
         retdict["Expected weight(G)"]= [expected_weight_G.mean(), "sequence"]
         retdict["Expected maximum weight"] = [expected_clique_weight.mean(),"sequence"]
         retdict["Expected distance"]= [expected_distance.mean(), "sequence"]
-        retdict["Currvol/Cliquevol"] = [clique_dist_hard.mean(),'sequence']
-        retdict["Currvol/Cliquevol all graphs in batch"] = [clique_dist_hard.squeeze(-1),'hist']
-        retdict["Average ratio of total volume"]= [total_vol_ratio.mean(),'sequence']
-        retdict["cardinalities"] = [cardinalities.squeeze(-1),"hist"]
-        retdict["Current edge percentage"] = [torch.tensor(current_edge_percentage),'sequence']
         retdict["loss"] = [loss.mean().squeeze(),"sequence"] #final loss
 
         return retdict

@@ -24,12 +24,11 @@ from torch.nn import Parameter
 from torch.nn import Sequential as Seq, Linear, ReLU, LeakyReLU
 from torch_geometric.nn import MessagePassing
 from torch.nn import Linear, Sequential, ReLU, BatchNorm1d as BN
-from torch_geometric.utils import scatter_
+#from torch_geometric.utils import scatter_
 from torch_geometric.data import Batch 
 from torch_scatter import scatter_min, scatter_max, scatter_add, scatter_mean
 from torch import autograd
 from torch_geometric.utils import softmax, add_self_loops, remove_self_loops, segregate_self_loops, remove_isolated_nodes, contains_isolated_nodes, add_remaining_self_loops
-from my_utils.cut_utils import get_diracs
 import gurobipy as gp
 from gurobipy import GRB
 ###########
@@ -116,7 +115,7 @@ class GATAConv(MessagePassing):
 
 def propagate(x, edge_index):
     row, col = edge_index
-    out = scatter_('add', x[col], row, dim_size=x.shape[0])
+    out = scatter_add(x[col], row, dim=0)
     return out
 
 def get_mask(x, edge_index, hops):
@@ -135,8 +134,6 @@ def total_var(x, edge_index, batch, undirected = True):
 
     tv = scatter_add(tv, batch[row], dim=0)
     return  tv
-
-    
 
 def derandomize_cut(data, probabilities, target, elasticity,  draw=False):
     row, col = data.edge_index
@@ -223,7 +220,7 @@ def get_diracs(data, N , n_diracs = 1,  sparse = False, flat = False, replace = 
             
             
             global_offset = 0
-            all_nodecounts = scatter_("add", torch.ones_like(batch_index,device=device), batch_index)
+            all_nodecounts = scatter_add(torch.ones_like(batch_index,device=device), batch_index,0)
             recfield_vols = torch.zeros(graphcount,device=device)
             total_vols = torch.zeros(graphcount,device=device)
             
@@ -285,7 +282,7 @@ def get_diracs(data, N , n_diracs = 1,  sparse = False, flat = False, replace = 
 
             
 #slow version     
-def derandomize_clique_final(data, probabilities, draw=False, weight_factor = 0.0, clique_number_bounds = None ,fig = None, device = 'cpu'):
+def decode_clique_final(data, probabilities, draw=False, weight_factor = 0.0, clique_number_bounds = None ,fig = None, device = 'cpu'):
     row, col = data.edge_index
     sets = probabilities.detach().unsqueeze(-1)
     batch = data.batch
@@ -370,7 +367,7 @@ def derandomize_clique_final(data, probabilities, draw=False, weight_factor = 0.
 
 
 #fast version
-def derandomize_clique_final_speed(data, probabilities, draw=False, weight_factor = 0.35, clique_number_bounds = None ,fig = None, device = 'cpu', beam = 1):
+def decode_clique_final_speed(data, probabilities, draw=False, weight_factor = 0.35, clique_number_bounds = None ,fig = None, device = 'cpu', beam = 1):
        
     row, col = data.edge_index
     sets = probabilities.detach().unsqueeze(-1)
