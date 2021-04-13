@@ -10,7 +10,7 @@ For a hands-on example please refer to the "Erdos_tud" notebook.
 
 ### Disclaimer:
 This is a brief tutorial on the probabilistic penalty method presented in the paper. I will be taking shortcuts in how I present it in order to make it straightforward and understandable. It does not cover the paper in its full generality. I will not expand on theoretical/technical details and derivations or on the connections with other fields/papers.
-Instead, I aim to provide an accessible primer into our work by minimizing the technical info and focusing on practicality/simplicity. I encourage you to read the paper and the supplementary material section for the complete treatment. Otherwise, if you're still unsure, just email me. Without further ado, let's get to it.
+Instead, I aim to provide an accessible primer into our work by minimizing the technical info and focusing on practicality/simplicity. I encourage you to read the paper and the supplementary material section for the complete treatment. Otherwise, if you're still unsure, just email me. Without further ado, let's get started.
 
 ## Erdos goes neural: a simplified tutorial
 
