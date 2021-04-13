@@ -124,5 +124,7 @@ Every experiment was run on a single TITAN RTX. So the memory requirements may b
 A: As stated in the paper (theorem 1), feasibility of the solutions will depend on how well the loss minimization goes during training. For example, suppose you only care about a feasibility problem, e.g., k-clique, and you only have Prob(S does not satisfy constraints) as your loss term. Then in that case, you will use an expectation of the weight of the complement to bound the probability. If that quantity is below 1, then the integral solution is guaranteed to be feasible from the method of conditional expectation.
 On the other hand, if training does not go well, then it's a good practice to manually ensure feasibility (by manually checking if the constraint is satisfied) when running the method of conditional expectation.
 
+*Q: Why use Bernoulli variables? Isn't this limiting?*
 
+A: Bernoulli variables in conjunction with Markov's inequality lead to  fairly straightforward derivations for loss functions. In pricinple, we could make different assumptions about the distribution and work with tighter concentration inequalities to obtain loss functions that are tailored to a specific problem. We opted for the simplest approach, as it produced satisfactory results without the need to resort to more sophisticated mathematical tools. Nevertheless, exploring alternative constructions is a promising direction that could lead to improvements in our framework.
 
