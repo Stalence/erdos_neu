@@ -1,6 +1,6 @@
 # This is the repository for our NeurIPS paper [Erdos goes Neural: An Unsupervised Learning Framework for Combinatorial Optimization on Graphs](https://proceedings.neurips.cc//paper/2020/hash/49f85a9ed090b20c8bed85a5923c669f-Abstract.html).
 
-Currently being updated...feel free to email me any questions and I will respond either directly or by adding your question to the FAQ.
+Currently being updated! Feel free to email me any questions and I will respond either directly or by adding your question to the FAQ.
 
 ### First, I highly recommend checking out our [blogpost](https://andreasloukas.blog/2020/10/31/erdos-goes-neural/).
 It is a good introduction if you want a brief overview of the key insights in the paper and how it relates to the the broader landscape of neural combinatorial optimization. Additionally,  to gain some intuition for the probabilistic method, I recommend reading the background section (2.2) in the paper, if you haven't  already.
