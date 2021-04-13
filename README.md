@@ -36,7 +36,7 @@ In the paper, we use Bernoulli variables over the nodes of the input graph. You 
 
 ## How to solve it:
 
-Now, suppose you have a cost function subject to some constraints.
+Now, suppose you have a combinatorial problem. You need to follow the steps below.
 ### Step 1:
 Write down the cost function of your problem, for example in our paper we consider the maximum clique problem.
 Here is the standard way of expressing it:
