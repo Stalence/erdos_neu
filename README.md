@@ -5,7 +5,7 @@ Currently being updated! Feel free to email me any questions and I will respond 
 ### First, I highly recommend checking out our [blogpost](https://andreasloukas.blog/2020/10/31/erdos-goes-neural/).
 It is a good introduction if you want a brief overview of the key insights in the paper and how it relates to the the broader landscape of neural combinatorial optimization. Additionally,  to gain some intuition for the probabilistic method, I recommend reading the background section (2.2) in the paper, if you haven't  already.
 
-Now, since we have been getting plenty of questions on how the method works, **below you will find a guide that will hopefully clear some things up**. I will also include an FAQ section that I will keep updating.
+Now, since we have been getting plenty of questions on how the method works, **below you will find a simplified guide for our framework**. I will also include an FAQ section that I will keep updating.
 For a hands-on example please refer to the "Erdos_tud" notebook.
 
 ### Disclaimer:
