@@ -26,7 +26,7 @@ Since we focused on graph problems in the paper, we will work with sets of nodes
 **From now on I will be talking about sets of nodes. Feel free to substitute it with edges or whatever else you need to work with.**
 
 Here is what we are going to need:
-#### 1) A combinatorial problem with a nonnegative cost function and constraints.
+#### 1) A combinatorial problem with a nonnegative cost function and a set of constraints.
 #### 2) A neural network that produces a probability for each node. This is the probability that the node belongs to the set S. 
 #### 3) A differentiable loss function. This loss takes as input the probabilities that were produced by the network. The loss will be derived from your problem's objective (I will explain below).  
 
