@@ -3,13 +3,13 @@
 Currently being updated! Feel free to email me any questions and I will respond either directly or by adding your question to the FAQ.
 
 ### First, I highly recommend checking out our [blogpost](https://andreasloukas.blog/2020/10/31/erdos-goes-neural/).
-It is a good introduction if you want a brief overview of the key insights in the paper and how it relates to the the broader landscape of neural combinatorial optimization. Additionally,  to gain some intuition for the probabilistic method, I recommend reading the background section (2.2) in the paper, if you haven't  already.
+It is a good introduction if you want a brief overview of the key insights in the paper and how it relates to the the broader landscape of neural combinatorial optimization. Additionally, to gain some intuition for the probabilistic method, I recommend reading the background section (2.2) in the paper.
 
 Now, since we have been getting plenty of questions on how the method works, **below you will find a simplified guide for our framework**. I will also include an FAQ section that I will keep updating.
 For a hands-on example please refer to the "Erdos_tud" notebook.
 
 ### Disclaimer:
-This is a brief tutorial on the probabilistic penalty method presented in the paper. I will be taking shortcuts in how I present it in order to make it straightforward and understandable. It does not cover the paper in its full generality. I will not expand on theoretical/technical details and derivations or on the connections with other fields/papers.
+This is a brief tutorial on the probabilistic penalty method presented in the paper. I will be taking shortcuts in how I present it in order to make it straightforward and understandable. It does not cover the paper in its full generality. I will not explain the probabilistic method and I won't expand on the various important details that constitute the full paper.
 Instead, I aim to provide an accessible primer into our work by minimizing the technical info and focusing on practicality/simplicity. I encourage you to read the paper and the supplementary material section for the complete treatment. Otherwise, if you're still unsure, just email me. Without further ado, let's get started.
 
 ## Erdos goes neural: a simplified tutorial
@@ -78,7 +78,7 @@ Therefore,
 From Markov's inequality, this can be bounded as follows
 #### Prob(weight(complement(S))>=1) <= expected_weight(complement(S)).
 So our loss ends up being
-#### Loss = gamma - expected_weight + beta * expected_weight(complement(S)).
+#### Loss = gamma - expected_weight(S) + beta * expected_weight(complement(S)).
 
 
 ### Step 4:
