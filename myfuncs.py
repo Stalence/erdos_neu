@@ -17,29 +17,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 from torch_geometric.utils import to_undirected, remove_self_loops
 from torch_geometric.utils import to_dense_adj
-
-
-from torch_geometric.data import Batch 
-
-import math
-
-import torch
-
-from torch.nn.parameter import Parameter
-from torch.nn.modules.module import Module
-from torch_geometric.utils import sparse as sp
-from torch_geometric.data import Data
-from torch_geometric.utils import convert as cnv
-import networkx as nx
-from networkx.drawing.nx_agraph import graphviz_layout
-from torch.distributions import categorical
-from torch.distributions import Bernoulli
-from torch.distributions import relaxed_categorical
-from torch.distributions.one_hot_categorical import OneHotCategorical
-from matplotlib import pyplot as plt
-import numpy as np
-from torch_geometric.utils import to_undirected, remove_self_loops
-from torch_geometric.utils import to_dense_adj
 from torch_geometric.data import Batch 
 
 def getNdiracs(data, N , sparse = False, flat = False, replace = True):
@@ -159,8 +136,6 @@ def padToData(x,data,adj= None):
     else:
         return newx
     
-    
-
 def drawGraphFromBatch(mybatch, index):    
    
     G=cnv.to_networkx(getSparseData(mybatch.x[index],mybatch.adj[index],mybatch.mask[index]))
@@ -219,9 +194,7 @@ def drawGraphFromData(myx,myadj,mask,seed=None,nodecolor=False,edgecolor=False,s
                     orderpaths[index] = -1 
                     positions[index]=pos[index]
                     orderpathswoseed[index]=-1
-
-       
-    
+                    
             if binarycut:
                 cutnodes = list(myx.nonzero().reshape(-1).numpy())
                 cutedg = nx.edge_boundary(G,cutnodes)
@@ -239,7 +212,6 @@ def drawGraphFromData(myx,myadj,mask,seed=None,nodecolor=False,edgecolor=False,s
                         cutpaths += [-1]
                         cutpos[i] = pos[i]
                 nx.draw_networkx_nodes(G,cutpos,nodelist=cutnodes,alpha=0.5,node_color=[[1, 0, 0]],node_shape='o',node_size=1000)
-
             
             for key in shortestpaths:
                 if key != theseed:
@@ -253,13 +225,11 @@ def drawGraphFromData(myx,myadj,mask,seed=None,nodecolor=False,edgecolor=False,s
                     position = {key: pos[key]}
                     
                     nx.draw_networkx_nodes(G,position,alpha=1.0,nodelist=[key],node_color='r',node_size=1200*scale)
-
-
+                    
             nx.draw_networkx_nodes(G,positions,alpha=0.65,nodelist=list(positions.keys()),node_color=list(orderpathswoseed.values()),vmin=0,vmax=maxpath,cmap=plt.cm.hsv,node_size=450)
             if hoplabels:
                 nx.draw_networkx_labels(G,pos,labels=orderpaths,font_color='k',alpha=0.75)
                 
-
     else:
         nodecolors = 'r'
     
@@ -288,8 +258,6 @@ def drawGraphFromData(myx,myadj,mask,seed=None,nodecolor=False,edgecolor=False,s
         else:
             nx.draw_networkx_edges(G,pos,G.edges()-cutedges,alpha=0.5)
             nx.draw_networkx_edges(G,pos,cutedges,alpha=0.5,width=5,edge_color='r')
-
-    
     return G, pos
 
 class GraphConvolution(Module):
@@ -325,7 +293,6 @@ class GraphConvolution(Module):
                + str(self.in_features) + ' -> ' \
                + str(self.out_features) + ')'
     
-    
 def sweep(myp,G,data):
 
     supp = torch.nonzero(myp).squeeze().tolist()
@@ -336,7 +303,6 @@ def sweep(myp,G,data):
     bestconductance = 1000
     bestvolume = 0
     bestset = []
-    
     for i in support:
         sweepset += [i]
         volume = nx.volume(G,sweepset)
@@ -345,10 +311,7 @@ def sweep(myp,G,data):
             bestconductance = conductance
             bestvolume = volume
             bestset = sweepset
-    
-    
     return bestset, bestconductance, bestvolume
-
 
 def pushv(p,r,index,adj,a):
 
@@ -359,7 +322,6 @@ def pushv(p,r,index,adj,a):
     for i in torch.nonzero(adj[index,:]):
         rprime[i.item()]= r[i.item()] + (1-a)*r[index]/(2*adj[index,:].sum(-1))
     return pprime, rprime
-
 
 def approxPRank(index,alpha,epsilon,data):
 
@@ -388,7 +350,6 @@ def pagerank_nibble(index,phi,vol,data,G):
     return bset,bcond,bvol,myp
 
 def lovaszSimonovits(myp,G,data):
-  
     supp=torch.nonzero(myp).squeeze().tolist()
     degs=data.adj[supp,:].sum(-1)
     sortedsupp=torch.argsort(myp[supp]/degs,descending=True).squeeze().tolist()
@@ -407,8 +368,6 @@ def clusterBench(method,graphno,dataset):
     
     numnodes= dataset[graphno].num_nodes
     seedset= torch.randint(numnodes,(3,1)).squeeze()
-    
-    
     efo=plt.figure(2,figsize=(8,8))
     G,pos=drawGraphFromData(dataset[graphno].x[:,0],dataset[graphno].adj,dataset[graphno].mask,nodecolor=False)
     f=plt.figure(1,figsize=(20,20))
@@ -425,28 +384,21 @@ def clusterBench(method,graphno,dataset):
         valuevec[bs]=1
         p,g=drawGraphFromData(valuevec,dataset[graphno].adj,dataset[graphno].mask,nodecolor=True)
         
-        
 def AdjToLocal(adj,mask):
-    
     truesize = mask.sum().item()
     newadj=adj[0,:truesize,:truesize]
     mygraph = nx.from_numpy_matrix(newadj.numpy())
     nx.write_edgelist(mygraph,'temp.edgelist',data=[])
     g = GraphLocal('temp.edgelist','edgelist',' ') 
     return g
-        
-        
-        
+               
 def AdjToLocal2(adj):
-   
     mygraph = nx.from_numpy_matrix(data.adj[0].numpy())
     nx.write_edgelist(mygraph,'temp.edgelist',data=[])
     g = GraphLocal('temp.edgelist','edgelist',' ') 
     return g
 
-
 def TestLocalClust(methodclass,smethod,test_loader,iterations=10000,delta=1e-04,param1=0.15,param2=1e-6,param3=100,param4=0.5,draw=False):
-   
     mean_conductance= 0 
     counter = 0
     for data in test_loader:
@@ -458,35 +410,23 @@ def TestLocalClust(methodclass,smethod,test_loader,iterations=10000,delta=1e-04,
             cutset, conductance = spectral_clustering(g,[seed],method=smethod,alpha=param1,rho=param2,vol=param3,phi=param4)
         if methodclass == "flow":
             cutset, conductance = flow_clustering(g,[seed],method,U=param1,h=param2,w=param3)
-        mean_conductance+=conductance      
-        
-        
+        mean_conductance+=conductance         
     mean_conductance = mean_conductance/counter
-    
     return mean_conductance
-            
-
-    
-    
+             
 def barabasi_albert_graph(num_nodes, num_edges):
-
     assert num_edges > 0 and num_edges < num_nodes
-
     row, col = torch.arange(num_edges), torch.randperm(num_edges)
-
     for i in range(num_edges, num_nodes):
         row = torch.cat([row, torch.full((num_edges, ), i, dtype=torch.long)])
         choice = np.random.choice(torch.cat([row, col]).numpy(), num_edges)
         col = torch.cat([col, torch.from_numpy(choice)])
-
     edge_index = torch.stack([row, col], dim=0)
     edge_index, _ = remove_self_loops(edge_index)
     edge_index = to_undirected(edge_index, num_nodes)
-
     return edge_index    
 
 def remove_Connected(dataset):
-    
     custom_dataset = []
     for data in dataset:
         g = cnv.to_networkx(data).to_undirected()
@@ -500,21 +440,15 @@ def remove_Connected(dataset):
             if(comp_size > maxsize):
                 maxsize = comp_size
                 maxset = comp 
-           
         maxset = list(maxset)
         adj = nx.adjacency_matrix(g).todense()
         adj = adj[maxset,:]  
         adj = adj[:,maxset]
         g2 = nx.from_numpy_matrix(adj).to_undirected()
-        custom_dataset +=  [cnv.from_networkx(g2)]
-        
-        
+        custom_dataset +=  [cnv.from_networkx(g2)]     
     return custom_dataset
-    
-    
-    
-def create_BAdataset(noderange, edge_param, start = 50, graphs_per_nodecount = 10, dense = False):
-    
+      
+def create_BAdataset(noderange, edge_param, start = 50, graphs_per_nodecount = 10, dense = False):   
     dataset = []
     final_size = start + noderange
     for i in range(noderange):
@@ -522,20 +456,13 @@ def create_BAdataset(noderange, edge_param, start = 50, graphs_per_nodecount = 1
             eind = myfuncs.barabasi_albert_graph(start+i,edge_param)
             data = Data(x = torch.ones(start+i), edge_index = eind )
             dataset += [data]
-
     if dense:
         for k in range(len(dataset)):
-            dataset[k] = Data(adj = to_dense_adj.to_dense_adj(dataset[k].edge_index).squeeze(0), x = dataset[k].x)
-            
+            dataset[k] = Data(adj = to_dense_adj.to_dense_adj(dataset[k].edge_index).squeeze(0), x = dataset[k].x)         
     return dataset
 
-
-def data_to_3D(x, edge_index, dimsize):
-        
+def data_to_3D(x, edge_index, dimsize):    
     return x.contiguous().view(dimsize,-1,3), edge_index.contiguous().view(2,dimsize,-1)
 
-    
-    
 def data_to_2D(x, edge_index, featdim ):
-        
     return x.view(-1,x.shape[featdim]), edge_index.view(2,-1)
