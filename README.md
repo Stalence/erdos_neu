@@ -1,6 +1,6 @@
 ## This is the repository for our NeurIPS paper [Erdos goes Neural: An Unsupervised Learning Framework for Combinatorial Optimization on Graphs](https://proceedings.neurips.cc//paper/2020/hash/49f85a9ed090b20c8bed85a5923c669f-Abstract.html).
 
-Update:  This [tutorial] can also be found on my [website](https://stalence.github.io/posts/2022-01-05/Erdos_Goes_Neural.html) with a slightly improved layout.
+Update:  This tutorial can also be found on my [website](https://stalence.github.io/posts/2022-01-05/Erdos_Goes_Neural.html) with a slightly improved layout.
 Feel free to email me any questions and I will respond either directly or by adding your question to the FAQ.
 
 ### First, I highly recommend checking out our [blogpost](https://andreasloukas.blog/2020/10/31/erdos-goes-neural/). 
