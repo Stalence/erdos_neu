@@ -31,6 +31,9 @@ from torch import autograd
 from torch_geometric.utils import softmax, add_self_loops, remove_self_loops, segregate_self_loops, remove_isolated_nodes, contains_isolated_nodes, add_remaining_self_loops
 import gurobipy as gp
 from gurobipy import GRB
+from torch_geometric.utils import is_undirected
+import numpy as np
+
 ###########
 
 class GATAConv(MessagePassing):
@@ -148,7 +151,7 @@ def derandomize_cut(data, probabilities, target, elasticity,  draw=False):
          num_nodes = (data.batch==graph).sum().item()            
          graph_set = sets[data.batch==graph].detach()
          sorted_indices = torch.argsort(graph_set, descending=True)
-         mark_edges = batch[row] == graph
+         mark_edges = (data.batch[row] == graph)
          lr_graph, lc_graph = data.edge_index[:,mark_edges]
          lr_graph = lr_graph - total_index
          lc_graph = lc_graph - total_index
