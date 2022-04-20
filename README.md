@@ -1,12 +1,12 @@
 ## This is the repository for our NeurIPS paper [Erdos goes Neural: An Unsupervised Learning Framework for Combinatorial Optimization on Graphs](https://proceedings.neurips.cc//paper/2020/hash/49f85a9ed090b20c8bed85a5923c669f-Abstract.html).
 
-Currently being updated! Feel free to email me any questions and I will respond either directly or by adding your question to the FAQ.
+Update:  This [tutorial] can also be found on my [website](https://stalence.github.io/posts/2022-01-05/Erdos_Goes_Neural.html) with a slightly improved layout.
+Feel free to email me any questions and I will respond either directly or by adding your question to the FAQ.
 
-### First, I highly recommend checking out our [blogpost](https://andreasloukas.blog/2020/10/31/erdos-goes-neural/).
+### First, I highly recommend checking out our [blogpost](https://andreasloukas.blog/2020/10/31/erdos-goes-neural/). 
 It is a good introduction if you want a brief overview of the key insights in the paper and how it relates to the broader landscape of neural combinatorial optimization. Additionally, to gain some intuition for the probabilistic method, I recommend reading the background section (2.2) in the paper.
 
-Now, since we have been getting plenty of questions on how the method works, **below you will find a simplified guide for our framework**. I will also include an FAQ section that I will keep updating.
-For a hands-on example that allows you to reproduce our results reported in the paper please refer to the "Erdos_tud" notebook.
+Now, since we have been getting plenty of questions on how the method works, **below you will find a simplified guide for our framework**. I will also include an FAQ section that I will keep updating. For a hands-on example that allows you to reproduce our results reported in the paper please refer to the "Erdos_Cliques" and "Erdos_Cuts" notebooks.
 
 ### Disclaimer:
 This is a brief tutorial on the probabilistic penalty method presented in the paper. I will be taking shortcuts in how I present it in order to make it straightforward and understandable. It does not cover the paper in its full generality. I will not explain the probabilistic method and I won't expand on the various important details that constitute the full paper.
