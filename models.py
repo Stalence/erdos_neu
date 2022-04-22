@@ -78,14 +78,21 @@ class cut_MPNN(torch.nn.Module):
             BN(self.hidden1),
         ),train_eps=False))
      
-        self.conv2 = GATAConv( self.hidden1, self.hidden2 ,heads=8)
-        self.lin1 = Linear(8*self.hidden2, self.hidden1)
+        #self.conv2 = GATAConv( self.hidden1, self.hidden2 ,heads=8)
+#         GINConv(Sequential(
+#             Linear(1,  self.hidden1),
+#             ReLU(),
+#             Linear(self.hidden1, self.hidden1),
+#             ReLU(),
+#             BN( self.hidden1)
+        
+        self.lin1 = Linear(self.hidden1, self.hidden1)
         self.bn2 = BN(self.hidden1)
         self.lin2 = Linear(self.hidden1, 1)
 
     def reset_parameters(self):
         self.conv1.reset_parameters()
-        self.conv2.reset_parameters() 
+        #self.conv2.reset_parameters() 
         for conv in self.convs:
             conv.reset_parameters()    
         for bn in self.bns:
@@ -102,8 +109,7 @@ class cut_MPNN(torch.nn.Module):
         xinit= x.clone()
         row, col = edge_index
         mask = get_mask(x,edge_index,1).to(x.dtype).unsqueeze(-1)
-
-        x = self.conv1(x, edge_index)
+        x = self.conv1(x.unsqueeze(-1), edge_index)
         xpostconv1 = x.detach() 
         x = x*mask
         for conv, bn in zip(self.convs, self.bns):
@@ -113,16 +119,17 @@ class cut_MPNN(torch.nn.Module):
                 x = x*mask
                 x = bn(x)
 
+      #  breakpoint()
+#         x = self.conv2(x, edge_index)
+#         mask = get_mask(mask,edge_index,1).to(x.dtype)
+#         x = x*mask
+#         xpostconvs = x.detach()
+        #breakpoint()
 
-        x = self.conv2(x, edge_index)
-        mask = get_mask(mask,edge_index,1).to(x.dtype)
-        x = x*mask
-        xpostconvs = x.detach()
-        #
         x = F.leaky_relu(self.lin1(x)) 
         x = x*mask
         x = self.bn2(x)
-
+        
         xpostlin1 = x.detach()
         x = F.dropout(x, p=0.5, training=self.training)
         x = F.leaky_relu(self.lin2(x)) 
